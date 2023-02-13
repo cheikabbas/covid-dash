@@ -27,15 +27,17 @@ url_cases <- "https://raw.githubusercontent.com/owid/covid-19-data/master/public
 url_locations <- "data/locations.csv"
 
 cases <- read_csv(url_cases,
-         num_threads = 4, progress = show_progress(),
-         col_select = c(date,location,total_cases,total_deaths))
+         num_threads = 4,
+         col_select = c(date,location,total_cases,total_deaths),
+         show_col_types = FALSE)
 
 locations <- read_csv(url_locations,
-                      num_threads = 4, progress = show_progress())
+                      num_threads = 4,
+                      show_col_types = FALSE)
 ## Data manipulation
 
 #replace empty number of deaths with 0
-cases$total_deaths <- df$total_deaths %>% replace_na(0)
+cases$total_deaths <- cases$total_deaths %>% replace_na(0)
 
 #delete "international" from locations
 locations <- locations%>%dplyr::filter(!is.na(population))
