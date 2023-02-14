@@ -47,41 +47,42 @@ data <- left_join(cases, locations, by = "location")
 
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
+ui <- dashboardPage(
+  dashboardHeader(title = "World COVID-19"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+        menuSubItem("Map", tabName = "map", icon = icon("map")),
+      menuItem("Analysis", tabName = "analysis", icon = icon("chart-line")),
+      menuItem("Raw data", tabName = "rawdata", icon = icon("database"))
     )
+  ),
+  dashboardBody(
+    fluidRow(
+      box(plotOutput("curve"))
+    )
+  )
 )
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-    })
+  output$curve <- renderPlot({
+    fig <- plot_ly(data, type = 'scatter', mode = 'lines')%>%
+      add_trace(x = ~date, y = ~total_cases)
+    fig <- fig %>%
+      layout(
+        xaxis = list(zerolinecolor = '#ffff',
+                     zerolinewidth = 2,
+                     gridcolor = 'ffff'),
+        yaxis = list(zerolinecolor = '#ffff',
+                     zerolinewidth = 2,
+                     gridcolor = 'ffff'),
+        plot_bgcolor='#e5ecf6', width = 900)
+    
+    
+    fig
+  })
 }
 
 # Run the application 
